@@ -92,7 +92,7 @@
           # =================================================================
           # DRIVER NVIDIA
           # =================================================================
-          boot.kernelPackages = pkgs.linuxPackages_lts;
+          boot.kernelPackages = pkgs.linuxPackages;
           hardware.opengl.enable = true;
           hardware.opengl.driSupport32Bit = true;
           services.xserver.videoDrivers = [ "nvidia" ];
