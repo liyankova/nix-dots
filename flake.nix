@@ -49,7 +49,7 @@
             isNormalUser = true;
             description = "Liyan";
             home = "/home/liyan";
-            extraGroups = [ "wheel" "games" "video" "adbusers" "kvm" "networkmanager" ]; // Added networkmanager group
+            extraGroups = [ "wheel" "games" "video" "adbusers" "kvm" "networkmanager" ]; 
             shell = pkgs.zsh;
           };
           environment.systemPackages = with pkgs; [ git curl vim home-manager ];
