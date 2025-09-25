@@ -1,5 +1,5 @@
 # ~/dotfiles/nix/home/liyan/default.nix
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, pkgs-unstable, user, ... }:
 
 {
   # This is the main entry point for the user configuration.
@@ -7,8 +7,8 @@
     ./dev.nix
     ./cli.nix
   ];
-  home.username = "liyan";
-  home.homeDirectory = "/home/users";
+  home.username = user.username;
+  home.homeDirectory = user.homeDirectory;
 
   # This value should not be changed after the first use.
   home.stateVersion = "25.05";

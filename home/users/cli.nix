@@ -1,5 +1,5 @@
 # ~/dotfiles/nix/home/users/cli.nix
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, pkgs-unstable, user, config, ... }:
 
 {
   # --- Program Configurations ---
@@ -7,10 +7,8 @@
     # Git Configuration
     git = {
       enable = true;
-      # User info is now managed in the flake's specialArgs for consistency,
-      # but you can override it here if needed.
-      # userName = "your-username";
-      # userEmail = "your-email";
+      userName = user.gitUsername;
+      userEmail = user.gitEmail;
     };
 
     # Zsh Configuration
@@ -39,8 +37,7 @@
 
       history = {
         size = 10000;
-        path = ".zsh_history";
-	share = true;
+        path = "$HOME/.zsh_history";
       };
       
       # We will manage dotfiles declaratively later.
@@ -78,7 +75,7 @@
     bat
     fzf
     zoxide
-    (pkgs-unstable.yazi.override { withImagePreview = true; }) # Example of enabling a feature
+    pkgs-unstable.yazi # Example of enabling a feature
   ];
 
   # --- Declarative PATH and Environment Variables ---
