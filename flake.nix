@@ -1,29 +1,22 @@
 {
-  description = "Konfigurasi NixOS Liyan - Langkah Migrasi 1";
+  description = "Konfigurasi NixOS Liyan - Langkah Migrasi 1.1 (dengan GRUB)";
 
   # =========================================================================
   # 1. INPUTS: Dependensi eksternal
   # =========================================================================
   inputs = {
-    # Stabil untuk sistem & Home Manager
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    
-    # Unstable untuk aplikasi modern nanti
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    
-    # Home Manager sekarang mengikuti STABLE untuk fondasi yang lebih kokoh
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
-    # Kita siapkan inputnya untuk langkah selanjutnya
     hyprland.url = "github:hyprwm/Hyprland";
     agenix.url = "github:ryantm/agenix";
   };
 
   # =========================================================================
-  # 2. CACHING: Optimisasi bandwidth (diambil dari best practice Perplexity)
+  # 2. CACHING: Optimisasi bandwidth
   # =========================================================================
   nixConfig = {
     extra-substituters = [
@@ -45,26 +38,17 @@
   outputs = { self, nixpkgs, ... }@inputs: {
     nixosConfigurations.laptop-hp = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      
-      # specialArgs akan kita gunakan lebih banyak saat sudah modular
       specialArgs = { inherit inputs; };
 
       modules = [
-        # Ini adalah satu-satunya file eksternal yang kita impor saat ini
         ./hardware-configuration.nix
-
-        # Semua konfigurasi lainnya kita letakkan di sini secara langsung
         ({ config, pkgs, ... }: {
           
           # =================================================================
-          # PENGATURAN INTI SISTEM (dari core.nix lama)
+          # PENGATURAN INTI SISTEM
           # =================================================================
-          
-          # Waktu & Bahasa
           time.timeZone = "Asia/Jakarta";
           i18n.defaultLocale = "en_US.UTF-8";
-
-          # Definisi User
           users.users.liyan = {
             isNormalUser = true;
             description = "Liyan";
@@ -72,19 +56,8 @@
             extraGroups = [ "wheel" "games" "video" "adbusers" "kvm" ];
             shell = pkgs.zsh;
           };
-
-          # Paket-paket dasar yang harus ada di sistem
-          environment.systemPackages = with pkgs; [
-            git
-            curl
-            vim
-            home-manager # Penting agar perintah `home-manager` tersedia
-          ];
-          
-          # Mengaktifkan ZSH sebagai shell sistem
+          environment.systemPackages = with pkgs; [ git curl vim home-manager ];
           programs.zsh.enable = true;
-
-          # Pengaturan Nix (diambil dari core.nix dan disempurnakan)
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
             auto-optimise-store = true;
@@ -94,43 +67,34 @@
             dates = "weekly";
             options = "--delete-older-than 7d";
           };
-
-          # Power Management & Bluetooth
           powerManagement.enable = true;
           hardware.bluetooth.enable = true;
           services.blueman.enable = true;
 
           # =================================================================
-          # BOOTLOADER (Asumsi systemd-boot, mohon konfirmasi)
+          # BOOTLOADER (Diperbarui menggunakan GRUB sesuai file lama Anda)
           # =================================================================
-  boot.loader.systemd-boot.enable = false;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  boot.loader.grub = {
-   enable = true;
-   efiSupport = true;
-   # version = 2;
-   device = "nodev";
-   useOSProber = false;
-  };
-  # boot.kernelPackages = pkgs.linuxPackages;
-
-  boot.loader.grub.extraEntries = ''
-    menuentry "Debian" {
-      search --fs-uuid --set=root 6ED1-C749
-      chainloader /EFI/debian/shimx64.efi
-  }
-  '';          # =================================================================
-          # DRIVER NVIDIA (Implementasi best practice)
-          # =================================================================
+          boot.loader.efi.canTouchEfiVariables = true;
+          boot.loader.grub = {
+            enable = true;
+            efiSupport = true;
+            device = "nodev"; # Penting untuk sistem EFI
+            useOSProber = false; # Lebih aman untuk tidak menggunakan os-prober
+            # Mempertahankan entri dual-boot Debian Anda
+            extraEntries = ''
+              menuentry "Debian" {
+                search --fs-uuid --set=root 6ED1-C749
+                chainloader /EFI/debian/shimx64.efi
+              }
+            '';
+          };
           
-          # Menggunakan kernel LTS untuk stabilitas driver legacy
+          # =================================================================
+          # DRIVER NVIDIA
+          # =================================================================
           boot.kernelPackages = pkgs.linuxPackages_lts;
-
-          # Mengaktifkan OpenGL
           hardware.opengl.enable = true;
           hardware.opengl.driSupport32Bit = true;
-
           services.xserver.videoDrivers = [ "nvidia" ];
           hardware.nvidia = {
             modesetting.enable = true;
@@ -139,13 +103,11 @@
             open = false;
             prime = {
               sync.enable = true;
-              # Bus ID ini mungkin perlu disesuaikan, tapi biasanya ini defaultnya
               intelBusId = "PCI:0:2:0";
               nvidiaBusId = "PCI:1:0:0";
             };
           };
 
-          # Versi sistem untuk NixOS
           system.stateVersion = "25.05";
         })
       ];
