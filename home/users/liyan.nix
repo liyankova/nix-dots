@@ -1,9 +1,11 @@
 # ~/dotfiles/nix/home/liyan/default.nix
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 {
   # This is the main entry point for the user configuration.
-
+  imports = [
+    ./dev.nix
+  ];
   home.username = "liyan";
   home.homeDirectory = "/home/users";
 
@@ -52,8 +54,6 @@
     nwg-look     # GTK theme switcher
   ];
 
-  # Allow Home Manager to manage itself
-  programs.home-manager.enable = true;
 
   # Home Manager modules for programs.
   programs = {
