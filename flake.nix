@@ -42,6 +42,7 @@
 
       modules = [
         ./hardware-configuration.nix
+	inputs.agenix.nixosModules.default
         ({ config, pkgs, lib, pkgs-unstable, ... }: 
         let
           # Define unstable packages for easier access.
@@ -180,6 +181,15 @@
             file = ./secrets/example-secret.age;
             owner = config.users.users.liyan.name; 
           };
+
+          # --- Home Manager Integration ---
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs = { inherit inputs pkgs-unstable; }; # Pass unstable packages
+            users.liyan = import ./home/users/liyan.nix;
+          };
+
           system.stateVersion = "25.05";
         })
       ];
