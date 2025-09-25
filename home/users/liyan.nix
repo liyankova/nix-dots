@@ -5,6 +5,7 @@
   # This is the main entry point for the user configuration.
   imports = [
     ./dev.nix
+    ./cli.nix
   ];
   home.username = "liyan";
   home.homeDirectory = "/home/users";
