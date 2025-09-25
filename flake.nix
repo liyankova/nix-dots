@@ -176,7 +176,10 @@
 	  programs.adb.enable = true;
 
 	  services.openssh.enable = true;
-
+          age.secrets.example-secret = {
+            file = ./secrets/example-secret.age;
+            owner = config.users.users.liyan.name; 
+          };
           system.stateVersion = "25.05";
         })
       ];

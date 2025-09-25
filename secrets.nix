@@ -2,7 +2,7 @@
 {
   # This file declares our secrets and who can edit them.
 
-  "secret.age".publicKeys = [
+  "secrets/example-secret.age".publicKeys = [
     # User Key: liyan
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAN09iS1jxNkCh2ZjZ1N/tsVXSGKNos8UAS2bBpvCUt6"
 
